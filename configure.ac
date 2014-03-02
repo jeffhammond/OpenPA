@@ -344,6 +344,8 @@ dnl without AC_TRY_RUN().
     OPA_TRY_PRIMITIVE_HEADER([opa_gcc_intrinsics.h], [GCC_INTRINSIC_ATOMICS], [gcc atomic intrinsics])
     OPA_TRY_PRIMITIVE_HEADER([opa_nt_intrinsics.h], [NT_INTRINSICS], [Windows NT atomic intrinsics])
     OPA_TRY_PRIMITIVE_HEADER([opa_sun_atomic_ops.h], [SUN_ATOMIC_OPS], [Sun atomic operations library])
+    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_critical.h], [OMP_CRITICAL], [OpenMP critical section])
+    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_atomics.h], [OMP_ATOMICS], [OpenMP atomics])
 
     if test "$checked_specified_primitive" = "no" ; then
         AC_MSG_ERROR([did not find specified atomic primitives file "$with_atomic_primitives"], 1)
