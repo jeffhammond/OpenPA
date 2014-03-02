@@ -5,8 +5,8 @@
  */
 
 /* FIXME needs to be converted to new style functions with OPA_int_t/OPA_ptr_t-types */
-#ifndef OPA_GCC_INTRINSICS_H_INCLUDED
-#define OPA_GCC_INTRINSICS_H_INCLUDED
+#ifndef OPA_OPENMP_H_INCLUDED
+#define OPA_OPENMP_H_INCLUDED
 
 /* FIXME do we need to align these? */
 typedef struct { volatile int v;    } OPA_int_t;
@@ -117,13 +117,15 @@ static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 #define OPA_swap_int_by_cas OPA_swap_int 
 #endif
 
-#define OPA_write_barrier()      __sync_synchronize()
-#define OPA_read_barrier()       __sync_synchronize()
-#define OPA_read_write_barrier() __sync_synchronize()
-#define OPA_compiler_barrier()   __asm__ __volatile__  ( ""  ::: "memory" )
+#define OMP_MEMORY_BARRIER { _Pragma("omp flush") }
+
+#define OPA_write_barrier()      OMP_MEMORY_BARRIER
+#define OPA_read_barrier()       OMP_MEMORY_BARRIER
+#define OPA_read_write_barrier() OMP_MEMORY_BARRIER
+#define OPA_compiler_barrier()   do { } while(0);
 
 
 
 #include"opa_emulated.h"
 
-#endif /* OPA_GCC_INTRINSICS_H_INCLUDED */
+#endif /* OPA_OPENMP_H_INCLUDED */
