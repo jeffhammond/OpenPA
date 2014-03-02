@@ -1,12 +1,19 @@
 /* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil ; -*- */
 /*  
- *  (C) 2008 by Argonne National Laboratory.
+ *  (C) 2008, 2014 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
  */
 
 /* FIXME needs to be converted to new style functions with OPA_int_t/OPA_ptr_t-types */
-#ifndef OPA_OPENMP_H_INCLUDED
-#define OPA_OPENMP_H_INCLUDED
+#ifndef OPA_OPENMP_ATOMICS_H_INCLUDED
+#define OPA_OPENMP_ATOMICS_H_INCLUDED
+
+#ifndef _OPENMP
+# error OpenMP support not available!!!
+#else
+# if (_OPENMP<201107)
+#  error You need OpenMP 3.1 or higher for the required atomic support.
+# else
 
 /* FIXME do we need to align these? */
 typedef struct { volatile int v;    } OPA_int_t;
@@ -116,4 +123,7 @@ static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 
 #include"opa_emulated.h"
 
-#endif /* OPA_OPENMP_H_INCLUDED */
+#endif // OpenMP 3.1
+#endif // OpenMP any
+
+#endif /* OPA_OPENMP_ATOMICS_H_INCLUDED */

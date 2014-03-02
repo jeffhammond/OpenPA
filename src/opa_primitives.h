@@ -118,6 +118,11 @@
 #include "primitives/opa_nt_intrinsics.h"
 #elif defined(OPA_USE_LOCK_BASED_PRIMITIVES)
 #include "primitives/opa_by_lock.h"
+#elif defined(OPA_USE_OMP_ATOMIC_PRIMITIVES)
+#warning OpenMP atomics do not support CAS.
+#include "primitives/opa_openmp_atomic.h"
+#elif defined(OPA_USE_OMP_CRITICAL_PRIMITIVES)
+#include "primitives/opa_openmp_critical.h"
 #else
 #error no primitives implementation specified
 #endif

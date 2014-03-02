@@ -7,6 +7,10 @@
 #ifndef OPA_OPENMP_CRITICAL_H_INCLUDED
 #define OPA_OPENMP_CRITICAL_H_INCLUDED
 
+#ifndef _OPENMP
+# error OpenMP support not available!!!
+#else
+
 #define OPA_IPC_SINGLE_CS_ENTER(msg)          \
     _Pragma("omp critical") {
 
@@ -175,5 +179,7 @@ static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 #define OPA_write_barrier()      OMP_MEMORY_BARRIER
 #define OPA_read_barrier()       OMP_MEMORY_BARRIER
 #define OPA_read_write_barrier() OMP_MEMORY_BARRIER
+
+#endif // OpenMP any
 
 #endif /* !defined(OPA_OPENMP_CRITICAL_H_INCLUDED) */
