@@ -319,10 +319,22 @@ elif test "$with_atomic_primitives" = "unsafe" ; then
     using_unsafe_primitives=yes
 elif test "$with_atomic_primitives" = "omp-critical" ; then
     using_emulated_primitives=yes
+    AC_OPENMP
+    if test "x$ac_cv_prog_c_openmp" = "xunsupported" ; then
+        AC_MSG_ERROR([The compiler does not support OpenMP.])
+    fi
+    CFLAGS="$CFLAGS $OPENMP_CFLAGS"
+    CPPFLAGS="$CFLAGS $OPENMP_CFLAGS"
     AC_DEFINE([USE_OPENMP_CRITICAL],[1],
               [define if lock-based emulation was explicitly requested at
                configure time via --with-atomic-primitives=omp-critical])
 elif test "$with_atomic_primitives" = "omp-atomic" ; then
+    AC_OPENMP
+    if test "x$ac_cv_prog_c_openmp" = "xunsupported" ; then
+        AC_MSG_ERROR([The compiler does not support OpenMP.])
+    fi
+    CFLAGS="$CFLAGS $OPENMP_CFLAGS"
+    CPPFLAGS="$CFLAGS $OPENMP_CFLAGS"
     AC_DEFINE([USE_OPENMP_ATOMIC],[1],
               [define if OpenMP atomics were explicitly requested at
                configure time via --with-atomic-primitives=omp-atomic])
