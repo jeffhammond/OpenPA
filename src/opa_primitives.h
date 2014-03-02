@@ -97,6 +97,7 @@
 /* Include the appropriate header for the architecture */
 #if defined(OPA_USE_UNSAFE_PRIMITIVES)
 /* comes first to permit user overrides in the style of NDEBUG */
+#error UNSAFE
 #include "primitives/opa_unsafe.h"
 #elif   defined(OPA_HAVE_GCC_AND_POWERPC_ASM)
 #include "primitives/opa_gcc_ppc.h"
@@ -111,6 +112,7 @@
 #elif defined(OPA_HAVE_GCC_AND_SICORTEX_ASM)
 #include "primitives/opa_gcc_sicortex.h"
 #elif defined(OPA_HAVE_GCC_INTRINSIC_ATOMICS)
+#error GCC
 #include "primitives/opa_gcc_intrinsics.h"
 #elif defined(OPA_HAVE_SUN_ATOMIC_OPS)
 #include "primitives/opa_sun_atomic_ops.h"
@@ -122,6 +124,7 @@
 #elif defined(OPA_USE_OPENMP_CRITICAL)
 #include "primitives/opa_openmp_critical.h"
 #elif defined(OPA_USE_LOCK_BASED_PRIMITIVES)
+#error LOCK_BASED
 #include "primitives/opa_by_lock.h"
 #else
 #error no primitives implementation specified

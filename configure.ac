@@ -319,11 +319,11 @@ elif test "$with_atomic_primitives" = "unsafe" ; then
     using_unsafe_primitives=yes
 elif test "$with_atomic_primitives" = "omp-critical" ; then
     using_emulated_primitives=yes
-    AC_DEFINE([OPENMP_CRITICAL],[1],
+    AC_DEFINE([USE_OPENMP_CRITICAL],[1],
               [define if lock-based emulation was explicitly requested at
                configure time via --with-atomic-primitives=omp-critical])
 elif test "$with_atomic_primitives" = "omp-atomic" ; then
-    AC_DEFINE([OPENMP_ATOMIC],[1],
+    AC_DEFINE([USE_OPENMP_ATOMIC],[1],
               [define if OpenMP atomics were explicitly requested at
                configure time via --with-atomic-primitives=omp-atomic])
 else
