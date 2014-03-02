@@ -85,37 +85,10 @@ static _opa_inline int OPA_decr_and_test_int(OPA_int_t *ptr)
 #define OPA_incr_int_by_fai OPA_incr_int
 #define OPA_decr_int_by_fad OPA_decr_int
 
-
-static _opa_inline void *OPA_cas_ptr(OPA_ptr_t *ptr, void *oldv, void *newv)
-{
-    int * prev;
-#pragma omp critical
-    {
-        prev = ptr->v;
-        if (prev == oldv) {
-            ptr->v = newv;
-        }
-    }
-    return prev;
-}
-
-static _opa_inline int OPA_cas_int(OPA_int_t *ptr, int oldv, int newv)
-{
-    int prev;
-#pragma omp critical
-    {
-        prev = ptr->v;
-        if (prev == oldv) {
-            ptr->v = newv;
-        }
-    }
-    return prev;
-}
-
 static _opa_inline void *OPA_swap_ptr(OPA_ptr_t *ptr, void *val)
 {
     int * prev;
-#pragma omp critical
+#pragma omp atomic capture
     {
         prev = ptr->v;
         ptr->v = val;
@@ -126,7 +99,7 @@ static _opa_inline void *OPA_swap_ptr(OPA_ptr_t *ptr, void *val)
 static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 {
     int prev;
-#pragma omp critical
+#pragma omp atomic capture
     {
         prev = ptr->v;
         ptr->v = val;
