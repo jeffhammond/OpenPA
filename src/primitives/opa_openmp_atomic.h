@@ -28,36 +28,28 @@ static _opa_inline int OPA_load_int(_opa_const OPA_int_t *ptr)
 {
     int retval;
 #pragma omp atomic read
-    {
-        retval = ptr->v;
-    }
+    retval = ptr->v;
     return retval;
 }
 
 static _opa_inline void OPA_store_int(OPA_int_t *ptr, int val)
 {
 #pragma omp atomic update
-    {
-        ptr->v = val;
-    }
+    ptr->v = val;
 }
 
 static _opa_inline void *OPA_load_ptr(_opa_const OPA_ptr_t *ptr)
 {
     int * retval;
 #pragma omp atomic read
-    {
-        retval = ptr->v;
-    }
+    retval = ptr->v;
     return retval;
 }
 
 static _opa_inline void OPA_store_ptr(OPA_ptr_t *ptr, void *val)
 {
 #pragma omp atomic update
-    {
-        ptr->v = val;
-    }
+    ptr->v = val;
 }
 
 #define OPA_load_acquire_int(ptr_)       OPA_load_int((ptr_))
@@ -81,7 +73,8 @@ static _opa_inline int OPA_decr_and_test_int(OPA_int_t *ptr)
     int new_val;
 #pragma omp atomic capture
     {
-        new_val = --(ptr->v);
+        --(ptr->v);
+        new_val = ptr->v;
     }
     return (0 == new_val);
 }
