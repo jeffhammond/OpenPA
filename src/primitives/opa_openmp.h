@@ -20,7 +20,7 @@ typedef struct { void * volatile v; } OPA_ptr_t;
 static _opa_inline int OPA_load_int(_opa_const OPA_int_t *ptr)
 {
     int retval;
-#pragma omp critical
+#pragma omp atomic read
     {
         retval = ptr->v;
     }
@@ -29,7 +29,7 @@ static _opa_inline int OPA_load_int(_opa_const OPA_int_t *ptr)
 
 static _opa_inline void OPA_store_int(OPA_int_t *ptr, int val)
 {
-#pragma omp critical
+#pragma omp atomic update
     {
         ptr->v = val;
     }
@@ -38,7 +38,7 @@ static _opa_inline void OPA_store_int(OPA_int_t *ptr, int val)
 static _opa_inline void *OPA_load_ptr(_opa_const OPA_ptr_t *ptr)
 {
     int * retval;
-#pragma omp critical
+#pragma omp atomic read
     {
         retval = ptr->v;
     }
@@ -47,7 +47,7 @@ static _opa_inline void *OPA_load_ptr(_opa_const OPA_ptr_t *ptr)
 
 static _opa_inline void OPA_store_ptr(OPA_ptr_t *ptr, void *val)
 {
-#pragma omp critical
+#pragma omp atomic update
     {
         ptr->v = val;
     }
@@ -58,14 +58,10 @@ static _opa_inline void OPA_store_ptr(OPA_ptr_t *ptr, void *val)
 #define OPA_load_acquire_ptr(ptr_)       OPA_load_ptr((ptr_))
 #define OPA_store_release_ptr(ptr_,val_) OPA_store_ptr((ptr_),(val_))
 
-/* gcc atomic intrinsics accept an optional list of variables to be
-   protected by a memory barrier.  These variables are labeled
-   below by "protected variables :". */
-
 static _opa_inline int OPA_fetch_and_add_int(OPA_int_t *ptr, int val)
 {
     int prev;
-#pragma omp critical
+#pragma omp atomic capture
     {
         prev = ptr->v;
         ptr->v += val;
@@ -76,7 +72,7 @@ static _opa_inline int OPA_fetch_and_add_int(OPA_int_t *ptr, int val)
 static _opa_inline int OPA_decr_and_test_int(OPA_int_t *ptr)
 {
     int new_val;
-#pragma omp critical
+#pragma omp atomic capture
     {
         new_val = --(ptr->v);
     }
@@ -116,7 +112,6 @@ static _opa_inline int OPA_cas_int(OPA_int_t *ptr, int oldv, int newv)
     return prev;
 }
 
-#ifdef SYNC_LOCK_TEST_AND_SET_IS_SWAP
 static _opa_inline void *OPA_swap_ptr(OPA_ptr_t *ptr, void *val)
 {
     int * prev;
@@ -139,19 +134,12 @@ static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
     return (int)prev;
 }
 
-#else
-#define OPA_swap_ptr_by_cas OPA_swap_ptr
-#define OPA_swap_int_by_cas OPA_swap_int
-#endif
-
 #define OMP_MEMORY_BARRIER { _Pragma("omp flush") }
 
 #define OPA_write_barrier()      OMP_MEMORY_BARRIER
 #define OPA_read_barrier()       OMP_MEMORY_BARRIER
 #define OPA_read_write_barrier() OMP_MEMORY_BARRIER
 #define OPA_compiler_barrier()   do { } while(0);
-
-
 
 #include"opa_emulated.h"
 
