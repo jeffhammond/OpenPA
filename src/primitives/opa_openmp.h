@@ -19,56 +19,44 @@ typedef struct { void * volatile v; } OPA_ptr_t;
    may not be true at all. */
 static _opa_inline int OPA_load_int(_opa_const OPA_int_t *ptr)
 {
-    return ptr->v;
+    int retval;
+#pragma omp critical
+    {
+        retval = ptr->v;
+    }
+    return retval;
 }
 
 static _opa_inline void OPA_store_int(OPA_int_t *ptr, int val)
 {
-    ptr->v = val;
+#pragma omp critical
+    {
+        ptr->v = val;
+    }
 }
 
 static _opa_inline void *OPA_load_ptr(_opa_const OPA_ptr_t *ptr)
 {
-    return ptr->v;
+    int * retval;
+#pragma omp critical
+    {
+        retval = ptr->v;
+    }
+    return retval;
 }
 
 static _opa_inline void OPA_store_ptr(OPA_ptr_t *ptr, void *val)
 {
-    ptr->v = val;
+#pragma omp critical
+    {
+        ptr->v = val;
+    }
 }
 
-static _opa_inline int OPA_load_acquire_int(_opa_const OPA_int_t *ptr)
-{
-    volatile int i = 0;
-    int tmp;
-    tmp = ptr->v;
-    __sync_lock_test_and_set(&i, 1); /* guarantees acquire semantics */
-    return tmp;
-}
-
-static _opa_inline void OPA_store_release_int(OPA_int_t *ptr, int val)
-{
-    volatile int i = 1;
-    __sync_lock_release(&i); /* guarantees release semantics */
-    ptr->v = val;
-}
-
-static _opa_inline void *OPA_load_acquire_ptr(_opa_const OPA_ptr_t *ptr)
-{
-    volatile int i = 0;
-    void *tmp;
-    tmp = ptr->v;
-    __sync_lock_test_and_set(&i, 1); /* guarantees acquire semantics */
-    return tmp;
-}
-
-static _opa_inline void OPA_store_release_ptr(OPA_ptr_t *ptr, void *val)
-{
-    volatile int i = 1;
-    __sync_lock_release(&i); /* guarantees release semantics */
-    ptr->v = val;
-}
-
+#define OPA_load_acquire_int(ptr_)       OPA_load_int((ptr_))
+#define OPA_store_release_int(ptr_,val_) OPA_store_int((ptr_),(val_))
+#define OPA_load_acquire_ptr(ptr_)       OPA_load_ptr((ptr_))
+#define OPA_store_release_ptr(ptr_,val_) OPA_store_ptr((ptr_),(val_))
 
 /* gcc atomic intrinsics accept an optional list of variables to be
    protected by a memory barrier.  These variables are labeled
@@ -76,12 +64,23 @@ static _opa_inline void OPA_store_release_ptr(OPA_ptr_t *ptr, void *val)
 
 static _opa_inline int OPA_fetch_and_add_int(OPA_int_t *ptr, int val)
 {
-    return __sync_fetch_and_add(&ptr->v, val, /* protected variables: */ &ptr->v);
+    int prev;
+#pragma omp critical
+    {
+        prev = ptr->v;
+        ptr->v += val;
+    }
+    return prev;
 }
 
 static _opa_inline int OPA_decr_and_test_int(OPA_int_t *ptr)
 {
-    return __sync_sub_and_fetch(&ptr->v, 1, /* protected variables: */ &ptr->v) == 0;
+    int new_val;
+#pragma omp critical
+    {
+        new_val = --(ptr->v);
+    }
+    return (0 == new_val);
 }
 
 #define OPA_fetch_and_incr_int_by_faa OPA_fetch_and_incr_int
@@ -93,28 +92,56 @@ static _opa_inline int OPA_decr_and_test_int(OPA_int_t *ptr)
 
 static _opa_inline void *OPA_cas_ptr(OPA_ptr_t *ptr, void *oldv, void *newv)
 {
-    return __sync_val_compare_and_swap(&ptr->v, oldv, newv, /* protected variables: */ &ptr->v);
+    int * prev;
+#pragma omp critical
+    {
+        prev = ptr->v;
+        if (prev == oldv) {
+            ptr->v = newv;
+        }
+    }
+    return prev;
 }
 
 static _opa_inline int OPA_cas_int(OPA_int_t *ptr, int oldv, int newv)
 {
-    return __sync_val_compare_and_swap(&ptr->v, oldv, newv, /* protected variables: */ &ptr->v);
+    int prev;
+#pragma omp critical
+    {
+        prev = ptr->v;
+        if (prev == oldv) {
+            ptr->v = newv;
+        }
+    }
+    return prev;
 }
 
 #ifdef SYNC_LOCK_TEST_AND_SET_IS_SWAP
 static _opa_inline void *OPA_swap_ptr(OPA_ptr_t *ptr, void *val)
 {
-    return __sync_lock_test_and_set(&ptr->v, val, /* protected variables: */ &ptr->v);
+    int * prev;
+#pragma omp critical
+    {
+        prev = ptr->v;
+        ptr->v = val;
+    }
+    return prev;
 }
 
 static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 {
-    return __sync_lock_test_and_set(&ptr->v, val, /* protected variables: */ &ptr->v);
+    int prev;
+#pragma omp critical
+    {
+        prev = ptr->v;
+        ptr->v = val;
+    }
+    return (int)prev;
 }
 
 #else
 #define OPA_swap_ptr_by_cas OPA_swap_ptr
-#define OPA_swap_int_by_cas OPA_swap_int 
+#define OPA_swap_int_by_cas OPA_swap_int
 #endif
 
 #define OMP_MEMORY_BARRIER { _Pragma("omp flush") }
