@@ -1,34 +1,17 @@
 /* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil ; -*- */
 /*
- *  (C) 2008 by Argonne National Laboratory.
+ *  (C) 2014 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
  */
 
-#ifndef OPA_BY_LOCK_H_INCLUDED
-#define OPA_BY_LOCK_H_INCLUDED
+#ifndef OPA_OPENMP_CRITICAL_H_INCLUDED
+#define OPA_OPENMP_CRITICAL_H_INCLUDED
 
-/* FIXME For now we rely on pthreads for our IPC locks.  This is fairly
-   portable, although it is obviously not 100% portable.  Some day when we
-   refactor the OPA_Process_locks code we should be able to use that again. */
-#if defined(OPA_HAVE_PTHREAD_H)
-#include <pthread.h>
-
-/* defined in opa_primitives.c */
-extern pthread_mutex_t *OPA_emulation_lock;
-
-/* FIXME these make less sense now that OPA is not inside of MPICH2.  Is there a
-   simpler name/scheme that could be used here instead? [goodell@ 2009-02-19] */
 #define OPA_IPC_SINGLE_CS_ENTER(msg)          \
-    do {                                        \
-        OPA_assert(OPA_emulation_lock);    \
-        pthread_mutex_lock(OPA_emulation_lock);     \
-    } while (0)
+    _Pragma("omp critical") {
 
 #define OPA_IPC_SINGLE_CS_EXIT(msg)           \
-    do {                                        \
-        OPA_assert(OPA_emulation_lock);    \
-        pthread_mutex_unlock(OPA_emulation_lock);   \
-    } while (0)
+    }
 
 typedef struct { volatile int v;  } OPA_int_t;
 typedef struct { int * volatile v; } OPA_ptr_t;
@@ -41,16 +24,7 @@ typedef struct { int * volatile v; } OPA_ptr_t;
     --------------------------
 
     These are versions of the atomic primitives that emulate the proper behavior
-    via the use of an inter-process lock.  For more information on their
-    individual behavior, please see the comment on the corresponding top level
-    function.
-
-    In general, these emulated primitives should _not_ be used.  Most algorithms
-    can be more efficiently implemented by putting most or all of the algorithm
-    inside of a single critical section.  These emulated primitives exist to
-    ensure that there is always a fallback if no machine-dependent version of a
-    particular operation has been defined.  They also serve as a very readable
-    reference for the exact semantics of our OPA_* ops.
+    via the use of OpenMP critical section.
 */
 
 static _opa_inline int OPA_load_int(_opa_const OPA_int_t *ptr)
@@ -195,11 +169,11 @@ static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
     return (int)prev;
 }
 
+#define OMP_MEMORY_BARRIER _Pragma("omp flush")
+
 /* lock/unlock provides barrier */
-#define OPA_write_barrier()      do {} while (0)
-#define OPA_read_barrier()       do {} while (0)
-#define OPA_read_write_barrier() do {} while (0)
+#define OPA_write_barrier()      OMP_MEMORY_BARRIER
+#define OPA_read_barrier()       OMP_MEMORY_BARRIER
+#define OPA_read_write_barrier() OMP_MEMORY_BARRIER
 
-
-#endif /* defined(OPA_HAVE_PTHREAD_H) */
-#endif /* !defined(OPA_BY_LOCK_H_INCLUDED) */
+#endif /* !defined(OPA_OPENMP_CRITICAL_H_INCLUDED) */
