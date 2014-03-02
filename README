@@ -82,6 +82,19 @@ opa_unsafe.h  - Used when you specify "--with-atomic-primitives=unsafe".  This
                 macro OPA_USE_UNSAFE_PRIMITIVES prior to including
                 opa_primitives.h.
 
+The following pseudo-platforms rely on OpenMP:
+
+opa_openmp_critical.h - This is equivalent to opa_by_lock.h except that OpenMP
+                        critical section is used instead of a Pthread mutex.
+                        This may be useful when a platform supports OpenMP but
+                        not POSIX.  The only non-Windows systems where this may
+                        be true are accelerator-type systems.
+
+opa_openmp_atomics.h  - This is an incomplete implementation because OpenMP does
+                        not support compare-and-swap.  However, it uses the
+                        atomic features provided in OpenMP 3.1 to implement
+                        the other operations, including swap.
+
 Known Issues
 ------------
 
