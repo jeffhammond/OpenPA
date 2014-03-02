@@ -196,7 +196,9 @@ AC_ARG_WITH([atomic-primitives], [AC_HELP_STRING([--with-atomic-primitives],
      available.  Note that using locks to implement atomic primitives will have
      a substantial impact on performance and is intended for testing only.  A
      value of 'unsafe' will use a non-atomic version of the primitives for performance
-     in single-threaded code and meta-testing.])],
+     in single-threaded code and meta-testing.  A value of 'openmp' will use an
+     atomic version of the primitives provided by OpenMP, which will use either
+     the OpenMP atomics or critical section.])],
     [AS_IF([test "$with_atomic_primitives" = "yes"], [with_atomic_primitives=auto])],
     [with_atomic_primitives=auto]
 )
@@ -315,6 +317,10 @@ if test "$with_atomic_primitives" = "no" ; then
                configure time via --with-atomic-primitives=no])
 elif test "$with_atomic_primitives" = "unsafe" ; then
     using_unsafe_primitives=yes
+elif test "$with_atomic_primitives" = "openmp" ; then
+    using_openmp_primitives=yes
+    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_atomics.h], [OMP_ATOMICS], [OpenMP atomics])
+    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_critical.h], [OMP_CRITICAL], [OpenMP critical section])
 else
 dnl We currently test for support of each platform or implementation by
 dnl attempting to compile the associated primitives header file.  This doesn't
@@ -344,8 +350,6 @@ dnl without AC_TRY_RUN().
     OPA_TRY_PRIMITIVE_HEADER([opa_gcc_intrinsics.h], [GCC_INTRINSIC_ATOMICS], [gcc atomic intrinsics])
     OPA_TRY_PRIMITIVE_HEADER([opa_nt_intrinsics.h], [NT_INTRINSICS], [Windows NT atomic intrinsics])
     OPA_TRY_PRIMITIVE_HEADER([opa_sun_atomic_ops.h], [SUN_ATOMIC_OPS], [Sun atomic operations library])
-    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_critical.h], [OMP_CRITICAL], [OpenMP critical section])
-    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_atomics.h], [OMP_ATOMICS], [OpenMP atomics])
 
     if test "$checked_specified_primitive" = "no" ; then
         AC_MSG_ERROR([did not find specified atomic primitives file "$with_atomic_primitives"], 1)
