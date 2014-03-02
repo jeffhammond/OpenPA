@@ -196,9 +196,9 @@ AC_ARG_WITH([atomic-primitives], [AC_HELP_STRING([--with-atomic-primitives],
      available.  Note that using locks to implement atomic primitives will have
      a substantial impact on performance and is intended for testing only.  A
      value of 'unsafe' will use a non-atomic version of the primitives for performance
-     in single-threaded code and meta-testing.  A value of 'openmp' will use an
-     atomic version of the primitives provided by OpenMP, which will use either
-     the OpenMP atomics or critical section.])],
+     in single-threaded code and meta-testing.  A value of 'omp-critical' will use an
+     emulated implementation using OpenMP critical sections.  A value of 'omp-atomic'
+     will use OpenMP 3.1+ atomics wherever possible.])],
     [AS_IF([test "$with_atomic_primitives" = "yes"], [with_atomic_primitives=auto])],
     [with_atomic_primitives=auto]
 )
@@ -317,10 +317,15 @@ if test "$with_atomic_primitives" = "no" ; then
                configure time via --with-atomic-primitives=no])
 elif test "$with_atomic_primitives" = "unsafe" ; then
     using_unsafe_primitives=yes
-elif test "$with_atomic_primitives" = "openmp" ; then
-    using_openmp_primitives=yes
-    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_atomics.h], [OMP_ATOMICS], [OpenMP atomics])
-    OPA_TRY_PRIMITIVE_HEADER([opa_openmp_critical.h], [OMP_CRITICAL], [OpenMP critical section])
+elif test "$with_atomic_primitives" = "omp-critical" ; then
+    using_emulated_primitives=yes
+    AC_DEFINE([OPENMP_CRITICAL],[1],
+              [define if lock-based emulation was explicitly requested at
+               configure time via --with-atomic-primitives=omp-critical])
+elif test "$with_atomic_primitives" = "omp-atomic" ; then
+    AC_DEFINE([OPENMP_ATOMIC],[1],
+              [define if OpenMP atomics were explicitly requested at
+               configure time via --with-atomic-primitives=omp-atomic])
 else
 dnl We currently test for support of each platform or implementation by
 dnl attempting to compile the associated primitives header file.  This doesn't
