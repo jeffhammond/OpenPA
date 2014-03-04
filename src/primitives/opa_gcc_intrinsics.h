@@ -48,8 +48,14 @@ static _opa_inline int OPA_load_acquire_int(_opa_const OPA_int_t *ptr)
 
 static _opa_inline void OPA_store_release_int(OPA_int_t *ptr, int val)
 {
+#ifdef _CRAYC
+    /* Cray C does not currently (March 4, 2014) support __sync_lock_release 
+       properly but that intrinsic appears to be approximated by an sfence. */
+    __builtin_ia32_sfence;
+#else
     volatile int i = 1;
     __sync_lock_release(&i); /* guarantees release semantics */
+#endif
     ptr->v = val;
 }
 
@@ -64,11 +70,16 @@ static _opa_inline void *OPA_load_acquire_ptr(_opa_const OPA_ptr_t *ptr)
 
 static _opa_inline void OPA_store_release_ptr(OPA_ptr_t *ptr, void *val)
 {
+#ifdef _CRAYC
+    /* Cray C does not currently (March 4, 2014) support __sync_lock_release 
+       properly but that intrinsic appears to be approximated by an sfence. */
+    __builtin_ia32_sfence;
+#else
     volatile int i = 1;
     __sync_lock_release(&i); /* guarantees release semantics */
+#endif
     ptr->v = val;
 }
-
 
 /* gcc atomic intrinsics accept an optional list of variables to be
    protected by a memory barrier.  These variables are labeled
