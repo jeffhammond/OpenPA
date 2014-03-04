@@ -76,12 +76,20 @@ static _opa_inline void OPA_store_release_ptr(OPA_ptr_t *ptr, void *val)
 
 static _opa_inline int OPA_fetch_and_add_int(OPA_int_t *ptr, int val)
 {
+#ifdef _CRAYC
+    return __sync_fetch_and_add(&ptr->v, val);
+#else
     return __sync_fetch_and_add(&ptr->v, val, /* protected variables: */ &ptr->v);
+#endif
 }
 
 static _opa_inline int OPA_decr_and_test_int(OPA_int_t *ptr)
 {
+#ifdef _CRAYC
+    return __sync_sub_and_fetch(&ptr->v, 1) == 0;
+#else
     return __sync_sub_and_fetch(&ptr->v, 1, /* protected variables: */ &ptr->v) == 0;
+#endif
 }
 
 #define OPA_fetch_and_incr_int_by_faa OPA_fetch_and_incr_int
@@ -93,23 +101,39 @@ static _opa_inline int OPA_decr_and_test_int(OPA_int_t *ptr)
 
 static _opa_inline void *OPA_cas_ptr(OPA_ptr_t *ptr, void *oldv, void *newv)
 {
+#ifdef _CRAYC
+    return __sync_val_compare_and_swap(&ptr->v, oldv, newv);
+#else
     return __sync_val_compare_and_swap(&ptr->v, oldv, newv, /* protected variables: */ &ptr->v);
+#endif
 }
 
 static _opa_inline int OPA_cas_int(OPA_int_t *ptr, int oldv, int newv)
 {
+#ifdef _CRAYC
+    return __sync_val_compare_and_swap(&ptr->v, oldv, newv);
+#else
     return __sync_val_compare_and_swap(&ptr->v, oldv, newv, /* protected variables: */ &ptr->v);
+#endif
 }
 
 #ifdef SYNC_LOCK_TEST_AND_SET_IS_SWAP
 static _opa_inline void *OPA_swap_ptr(OPA_ptr_t *ptr, void *val)
 {
+#ifdef _CRAYC
+    return __sync_lock_test_and_set(&ptr->v, val);
+#else
     return __sync_lock_test_and_set(&ptr->v, val, /* protected variables: */ &ptr->v);
+#endif
 }
 
 static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 {
+#ifdef _CRAYC
+    return __sync_lock_test_and_set(&ptr->v, val);
+#else
     return __sync_lock_test_and_set(&ptr->v, val, /* protected variables: */ &ptr->v);
+#endif
 }
 
 #else
