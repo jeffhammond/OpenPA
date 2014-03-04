@@ -117,12 +117,18 @@ static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 #define OPA_swap_int_by_cas OPA_swap_int 
 #endif
 
-#define OPA_write_barrier()      __sync_synchronize()
-#define OPA_read_barrier()       __sync_synchronize()
-#define OPA_read_write_barrier() __sync_synchronize()
+#ifdef _CRAYC
+/* Cray C does not currently (March 4, 2014) support __sync_synchronize */
+#define OPA_write_barrier()      __builtin_ia32_mfence
+#define OPA_read_barrier()       __builtin_ia32_mfence
+#define OPA_read_write_barrier() __builtin_ia32_mfence
+#define OPA_compiler_barrier()   
+#else
+#define OPA_write_barrier()      __sync_synchronize
+#define OPA_read_barrier()       __sync_synchronize
+#define OPA_read_write_barrier() __sync_synchronize
 #define OPA_compiler_barrier()   __asm__ __volatile__  ( ""  ::: "memory" )
-
-
+#endif
 
 #include"opa_emulated.h"
 
