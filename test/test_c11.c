@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     assert(10 == c);
 
     //c = OPA_swap_int(&a, OPA_load_int(&b));
-    c = atomic_exchange_explicit(&a,
+    c = atomic_exchange_explicit(&a, /* not sure if the following load_explicit is required */
                                  atomic_load_explicit(&b, memory_order_relaxed),
                                  memory_order_relaxed);
 
