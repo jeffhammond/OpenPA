@@ -138,7 +138,10 @@ static _opa_inline int OPA_swap_int(OPA_int_t *ptr, int val)
 #define OPA_read_barrier()       atomic_thread_fence(memory_order_acq_rel);
 #define OPA_read_write_barrier() atomic_thread_fence(memory_order_acq_rel);
 /* FYI: According to C11 7.17.4.2 NOTE 2, atomic_signal_fence acts as
- *      a compiler barrier.  Note sure how memory_order affects this. */
+ *      a compiler barrier.  Note sure how memory_order affects this.
 #define OPA_compiler_barrier()   atomic_signal_fence(memory_order_acq_rel);
+ * Dave objects to the use of atomic_signal_fence as a compiler barrier and
+ * he is probably right that a no-op implementation is fine. */
+#define OPA_compiler_barrier()
 
 #endif /* OPA_C11_ATOMICS_H_INCLUDED */
