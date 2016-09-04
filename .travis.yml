@@ -1,0 +1,36 @@
+sudo: false
+language: c
+os:
+- linux
+- osx
+compiler:
+- gcc
+- clang
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    # clang-3.8 comes from this
+    - llvm-toolchain-precise
+    packages:
+    - gcc-4.9
+    - gcc-5
+    - gcc-6
+    - clang-3.8
+before_script:
+- ./autogen.sh
+script:
+- ./configure
+- make
+- make check
+after_failure:
+- echo "Sad panda"
+- find . -name config.log -exec grep -L "configure: exit 0" {} ";" | xargs cat
+notifications:
+  email:
+    recipients:
+    - jeff.science@gmail.com
+    on_success:
+    - change
+    on_failure:
+    - always
