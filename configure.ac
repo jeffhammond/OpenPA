@@ -342,7 +342,8 @@ dnl without AC_TRY_RUN().
     fi
 
     OPA_TRY_PRIMITIVE_HEADER([opa_c11_atomics.h], [C11_ATOMICS], [C11 atomics])
-    OPA_TRY_PRIMITIVE_HEADER([opa_gcc_intrinsics.h], [GCC_INTRINSIC_ATOMICS], [gcc atomic intrinsics])
+    OPA_TRY_PRIMITIVE_HEADER([opa_gcc_new_intrinsics.h], [GCC_NEW_INTRINSIC_ATOMICS], [gcc new (__atomic) atomic intrinsics])
+    OPA_TRY_PRIMITIVE_HEADER([opa_gcc_intrinsics.h], [GCC_INTRINSIC_ATOMICS], [gcc old (__sync) atomic intrinsics])
     OPA_TRY_PRIMITIVE_HEADER([opa_nt_intrinsics.h], [NT_INTRINSICS], [Windows NT atomic intrinsics])
     OPA_TRY_PRIMITIVE_HEADER([opa_sun_atomic_ops.h], [SUN_ATOMIC_OPS], [Sun atomic operations library])
 

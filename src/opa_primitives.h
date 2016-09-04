@@ -112,6 +112,8 @@
 #include "primitives/opa_gcc_ia64.h"
 #elif defined(OPA_HAVE_GCC_AND_SICORTEX_ASM)
 #include "primitives/opa_gcc_sicortex.h"
+#elif defined(OPA_HAVE_GCC_NEW_INTRINSIC_ATOMICS)
+#include "primitives/opa_gcc_new_intrinsics.h"
 #elif defined(OPA_HAVE_GCC_INTRINSIC_ATOMICS)
 #include "primitives/opa_gcc_intrinsics.h"
 #elif defined(OPA_HAVE_SUN_ATOMIC_OPS)
