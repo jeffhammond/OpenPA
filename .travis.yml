@@ -25,6 +25,9 @@ addons:
     - gcc-5
     - gcc-6
     - clang-3.8
+install:
+- export PATH=./deps/bin:$PATH
+- sh ./.travis-install-autotools.sh ./deps
 before_script:
 - ./autogen.sh
 script:
