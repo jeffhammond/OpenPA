@@ -6,6 +6,14 @@ os:
 compiler:
 - gcc
 - clang
+env:
+  matrix:
+  - CFLAGS=-std=c89
+  - CFLAGS=-std=c99
+  - CFLAGS=-std=c11
+  - CFLAGS=-std=gnu89
+  - CFLAGS=-std=gnu99
+  - CFLAGS=-std=gnu11
 addons:
   apt:
     sources:
