@@ -3,7 +3,8 @@
 #  (C) 2008 by Argonne National Laboratory.
 #      See COPYRIGHT in top-level directory.
 
-TESTS = sanity test_primitives test_barriers test_queue test_c11
+TESTS = sanity test_primitives test_barriers test_queue test_c11 \
+	test_new_gcc_intrinsics
 
 check_PROGRAMS = $(TESTS)
 
@@ -16,5 +17,6 @@ test_primitives_SOURCES = test_primitives.c opa_test.h
 test_barriers_SOURCES = test_barriers.c opa_test.h
 test_queue_SOURCES = test_queue.c opa_test.h
 test_c11_SOURCES = test_c11.c
+test_new_gcc_intrinsics_SOURCES = test_new_gcc_intrinsics.c
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
