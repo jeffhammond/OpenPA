@@ -26,10 +26,10 @@ addons:
     - gcc-6
     - clang-3.8
 install:
-- echo $PWD
-- export PATH=$PWD/deps/bin:$PATH
-- ls -alrt *
-- sh $PWD/.travis-install-autotools.sh $PWD/deps
+- export WORKING_DIRECTORY=$PWD
+- mkdir -p $WORKING_DIRECTORY/deps
+- export PATH=$WORKING_DIRECTORY/deps/bin:$PATH
+- sh .travis-install-autotools.sh $WORKING_DIRECTORY/deps
 before_script:
 - ./autogen.sh
 script:
