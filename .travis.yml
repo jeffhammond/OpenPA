@@ -38,7 +38,7 @@ script:
 - make check
 after_failure:
 - echo "Sad panda"
-- find . -name config.log -exec grep -L "configure: exit 0" {} ";" | xargs cat
+- find . -name config.log -exec cat {} ";"
 notifications:
   email:
     recipients:
