@@ -8,12 +8,12 @@ compiler:
 - clang
 env:
   matrix:
-  - CFLAGS=-std=c89
-  - CFLAGS=-std=c99
-  - CFLAGS=-std=c11
-  - CFLAGS=-std=gnu89
-  - CFLAGS=-std=gnu99
-  - CFLAGS=-std=gnu11
+  - OPA_CFLAGS=-std=c89
+  - OPA_CFLAGS=-std=c99
+  - OPA_CFLAGS=-std=c11
+  - OPA_CFLAGS=-std=gnu89
+  - OPA_CFLAGS=-std=gnu99
+  - OPA_CFLAGS=-std=gnu11
 addons:
   apt:
     sources:
@@ -33,7 +33,7 @@ install:
 before_script:
 - ./autogen.sh
 script:
-- ./configure
+- ./configure CFLAGS=$OPA_CFLAGS
 - make
 - make check
 after_failure:
