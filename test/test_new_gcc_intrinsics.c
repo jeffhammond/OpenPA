@@ -4,8 +4,15 @@
 
 #include <assert.h>
 
+#if defined(__GNUC__) && defined(__GNUC_MINOR__)
+# if ((__GNUC__ == 4) && (__GNUC_MINOR__ < 7)) || (__GNUC__ < 4)
+#  define GCC_ATOMIC_NOT_SUPPORTED
+# endif
+#endif
+
 int main(int argc, char **argv)
 {
+#ifndef GCC_ATOMIC_NOT_SUPPORTED
     int a, b;
     int c;
 
@@ -44,6 +51,8 @@ int main(int argc, char **argv)
     assert(1 == __atomic_load_n(&a, __ATOMIC_RELAXED));
 
     printf("success!\n");
-
+#else
+    printf("not supported!\n");
+#endif
     return 0;
 }
